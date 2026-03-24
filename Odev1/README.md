@@ -143,3 +143,8 @@ jupyter notebook proje.ipynb
 Tum rastgele tohumlar 42 olarak sabitlenmistir.
 Ayni veri bolunmesi, agirlik baslatma ve hiperparametreler kullanilmistir.
 Kod tekrar calistirildiginda ayni sonuclar elde edilecektir.
+
+
+## Ekler
+Veri Seti:
+https://www.kaggle.com/datasets/uciml/breast-cancer-wisconsin-data/data
