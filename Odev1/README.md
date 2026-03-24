@@ -147,4 +147,15 @@ Kod tekrar calistirildiginda ayni sonuclar elde edilecektir.
 
 ## Ekler
 Veri Seti:
+
 https://www.kaggle.com/datasets/uciml/breast-cancer-wisconsin-data/data
+
+From scratch:
+
+  * [NumPy Official Documentation](https://numpy.org/doc/stable/): (dot product, broadcasting) matematiksel olarak doğru kurgulamak için referans alınmıştır.
+
+  * [Scikit-learn Metrics and Scoring](https://scikit-learn.org/stable/modules/model_evaluation.html): Karmaşıklık matrisinin hesaplanması ve sınıflandırma metriklerinin altyapısındaki matematiksel denklemleri doğrulamak için incelenmiştir.
+
+  * [Scikit-learn Preprocessing](https://scikit-learn.org/stable/modules/preprocessing.html)
+
+  * [PyTorch `nn.Module` Documentation](https://pytorch.org/docs/stable/generated/torch.nn.Module.html): Sinir ağı katmanlarının ve fonksiyonlarının OOP standartlarına uygun olarak tasarlanması
