@@ -17,32 +17,32 @@ class NeuralNetwork:
             self.weights.append(W)
             self.biases.append(b)
 
-    def _sigmoid(self, z):
+    def __sigmoid(self, z):
         z = np.clip(z, -500, 500)
         return 1 / (1 + np.exp(-z))
 
-    def _relu(self, z):
+    def __relu(self, z):
         return np.maximum(0, z)
 
-    def _relu_deriv(self, z):
+    def __relu_deriv(self, z):
         return (z > 0).astype(float)
 
-    def forward(self, X):
+    def __forward(self, X):
         self.activations = [X]
         self.z_values = []
         A = X
         for i in range(self.n_layers - 1):
             Z = A @ self.weights[i] + self.biases[i]
             self.z_values.append(Z)
-            A = self._relu(Z)
+            A = self.__relu(Z)
             self.activations.append(A)
         Z = A @ self.weights[-1] + self.biases[-1]
         self.z_values.append(Z)
-        A = self._sigmoid(Z)
+        A = self.__sigmoid(Z)
         self.activations.append(A)
         return A
 
-    def compute_loss(self, y, y_hat):
+    def __compute_loss(self, y, y_hat):
         m = y.shape[0]
         eps = 1e-8
         y_hat = np.clip(y_hat, eps, 1 - eps)
@@ -52,7 +52,7 @@ class NeuralNetwork:
             bce += (self.lambda_reg / (2 * m)) * reg
         return bce
 
-    def backward(self, y):
+    def __backward(self, y):
         # Geri yayilim: gradyan hesaplama
         m = y.shape[0]
         self.d_weights = []
@@ -68,15 +68,15 @@ class NeuralNetwork:
             self.d_biases.insert(0, db)
             if i > 0:
                 dA = dA @ self.weights[i].T
-                dA = dA * self._relu_deriv(self.z_values[i-1])
+                dA = dA * self.__relu_deriv(self.z_values[i-1])
 
-    def update(self):
+    def __update(self):
         for i in range(self.n_layers):
             self.weights[i] -= self.lr * self.d_weights[i]
             self.biases[i] -= self.lr * self.d_biases[i]
 
     def predict(self, X):
-        return (self.forward(X) >= 0.5).astype(int)
+        return (self.__forward(X) >= 0.5).astype(int)
 
     def accuracy(self, X, y):
         return np.mean(self.predict(X) == y)
@@ -91,13 +91,13 @@ class NeuralNetwork:
             X_s, y_s = X_train[idx], y_train[idx]
             for start in range(0, m, batch_size):
                 end = min(start + batch_size, m)
-                self.forward(X_s[start:end])
-                self.backward(y_s[start:end])
-                self.update()
-            y_hat_tr = self.forward(X_train)
-            y_hat_val = self.forward(X_val)
-            history["train_loss"].append(self.compute_loss(y_train, y_hat_tr))
-            history["val_loss"].append(self.compute_loss(y_val, y_hat_val))
+                self.__forward(X_s[start:end])
+                self.__backward(y_s[start:end])
+                self.__update()
+            y_hat_tr = self.__forward(X_train)
+            y_hat_val = self.__forward(X_val)
+            history["train_loss"].append(self.__compute_loss(y_train, y_hat_tr))
+            history["val_loss"].append(self.__compute_loss(y_val, y_hat_val))
             history["train_acc"].append(self.accuracy(X_train, y_train))
             history["val_acc"].append(self.accuracy(X_val, y_val))
             if verbose and (epoch + 1) % 200 == 0:
