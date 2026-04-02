@@ -1,33 +1,33 @@
 # YZM304 Derin Ogrenme - Proje Odevi 1
 
-Wisconsin Breast Cancer veri seti uzerinde meme kanseri (Malign / Benign) teshisi amaciyla ikili siniflandirma yapan sinir agi modelleri gelistirilmistir. Calisma kapsaminda ag yapisi laboratuvar kodunun altyapisi baz alinarak NumPy uzerinden nesne yonelimli programlama (OOP) yapisi ile olusturulmus; ardindan elde edilen sonuclar Scikit-learn ve PyTorch kutuphaneleriyle kiyaslanmistir.
+Wisconsin Breast Cancer veri seti uzerinde meme kanseri (Malign / Benign) teshisi amaciyla ikili siniflandirma yapan sinir agi modelleri gelistirilmistir. Calisma kapsaminda ag yapisi laboratuvar uygulamasina sadik kalinarak NumPy kütüphanesiyle nesne yonelimli programlama (OOP) uzerinden kurgulanmis; ciktilar Scikit-learn ve PyTorch karsiliklariyla kiyaslanmistir.
 
 ## 1. Giris (Introduction)
 
-Tibbi tani problemlerinde yanlis negatif oranlarinin minimize edilmesi oncelikli hedeftir. Bu projede, sinir aglarinin ogrenme dinamiklerini analiz etmek amaciyla 13.03.2026 tarihli laboratuvar uygulamasi altyapisi kullanilarak bir Cok Katmanli Algilayici (MLP) kurgulanmistir. Model, farkli katman sayilari ve guncelleme stratejileri (mini-batch, L2 regularizasyonu) ile egitilmis ve optimize edilmistir. Uretilen modelin ciktilari Scikit-learn (MLPClassifier) ve PyTorch karsiliklari ile kiyaslanarak matematiksel isleyis dogrulanmistir.
+Tibbi tani veroklerinde yanlis negatif (False Negative) oranlarinin minimize edilmesi projenin oncelikli hedefidir. Calismada, sinir aglarinin ogrenme dinamiklerini incelemek uzere laboratuvar altyapisi referans alinan bir Cok Katmanli Algilayici (MLP) kurgulanmistir. Model, mimarideki degisimlerin (katman/noron sayilari) ve farkli optimizasyon yontemlerinin (mini-batch, L2 regularizasyonu) basariya etkisini olcmek uzere optimize edilmistir. Manuel yazilan uygulamanin sonuclari Scikit-learn (MLPClassifier) ve PyTorch ile uretilen aglarla eslestirilerek matematiksel isleyis dogrulanmistir.
 
 ## 2. Yontemler (Methods)
 
 2.1. Veri ve On Isleme
-Veri seti 569 ornek (212 Malign, 357 Benign) ve 30 sayisal ozellik icermektedir. Veri sizintisini onlemek amaciyla veri seti sirasiyla %70 Egitim, %15 Dogrulama (Validation) ve %15 Test oranlarinda tabakali (stratified) olarak bolunmustur. StandardScaler yalnizca egitim seti uzerinde egitilmis ve test setleri bu olcek uzerinden donusturulmustur.
+Veri seti 569 ornek (212 Malign, 357 Benign) icermektedir. Veri sizintisini (data leakage) engellemek amaciyla veri seti %70 Egitim, %15 Dogrulama (Validation) ve %15 Test olmak uzere tabakali (stratified) oranlarda bolunmustur. StandardScaler fonksiyonu yalnizca egitim seti uzerinde egitilmis ve diger veri kumeleri bu egitime gore donusturulmustur.
 
 2.2. Model Mimarisi
-Gelistirilen NeuralNetwork sinifi, gizli katmanlarda ReLU, cikis katmaninda Sigmoid aktivasyon fonksiyonlarini kullanmaktadir. Agirlik baslatma (Weight Initialization) isleminde He Initialization yontemi tercih edilmistir. Kayip fonksiyonu olarak Ikili Capraz Entropi (Binary Cross-Entropy) uygulanmis ve Stochastic Gradient Descent (SGD) algoritmasi ile geri yayilim hesaplanmistir. Sınıf icerisindeki moduller encapsulation (private metotlar) ile tanimlanmistir.
+Gelistirilen NeuralNetwork sinifinda gizli katmanlar icin ReLU, tahminsel donusum (cikis) katmani icin Sigmoid aktivasyon fonksiyonlari secilmistir. Agirlik baslatma yonteminde He Initialization uygulanmistir. Kayip fonksiyonu Ikili Capraz Entropi (Binary Cross-Entropy) olarak belirlenmis ve Stochastic Gradient Descent (SGD) algoritmasi ile geri yayilim turevleri alinmistir. Sinif modulleri encapsulation mantigi ile private (gizli) metotlar cercevesinde kurgulanmistir.
 
 2.3. Kontrollu Rastgelelik
-Modellerin agirlik atamalarinda ve veri bolme islemlerinde Seed (Random State) degeri 42 olarak sabitlenmistir. 
+Algoritmalarin (NumPy, Scikit-learn, PyTorch) ilk agirlik atamalarinda adil bir kiyaslama olusturmak adina Seed (Random State) degeri 42 olarak ayarlanmistir. 
 
 2.4. Deney Tasarimi ve Hiperparametreler
-Model kurgusu uzerinde 5 farkli varyasyon 1000 epoch boyunca egitilmistir (Ogrenme Orani: 0.01):
+Model parametreleri 1000 epoch boyunca 0.01 ogrenme orani ile bes farkli varyasyonda test edilmistir:
 - Temel: 1 Gizli Katman (64 Noron)
 - Genis: 1 Gizli Katman (128 Noron)
 - Derin: 2 Gizli Katman (64 ve 32 Noron)
-- L2 Reg: Temel model yapisina L2 Regularizasyonu eklentisi (Lambda: 0.01)
-- Mini-Batch: Temel model yapisina Mini-batch eklentisi (Batch Size: 32)
+- L2 Reg: Temel modele L2 Regularizasyonu eklentisi (Lambda: 0.01)
+- Mini-Batch: Temel modele Mini-batch eklentisi (Batch Size: 32)
 
 ## 3. Sonuclar (Results)
 
-Ogrenme oranlarinin tek basina degerlendirilmesi eksik cikarimlara yol acabileceginden, test verileri uzerinden Confusion Matrix (Karmasiklik Matrisi) metrikleri hesaplanmistir. Hesaplanan Isi haritalari (Heatmap), egitim loss/accuracy egrileri ve metriklerin bar kiyaslamalari "models" klasoru altinda paylasilmistir (Test Seti Ornek Sayisi: 86).
+Ogrenme egrilerinin yalin accuray ile degerlendirilmesi yaniltici sonuc urettiginden, final test verileri (86 Ornek) uzerinden analizler karmasiklik matrisine donusturulmustur. Tum egitim sureclerine ait Isi haritalari (Heatmap), Loss/Accuracy egrileri ve metriklerin cubuk grafikleri models klasorune kaydedilmistir.
 
 | Model | Test Acc | Precision| Recall | F1 Score | Confusion Matrix (TN, FP, FN, TP) |
 |-------|----------|----------|--------|----------|-----------------------------------|
@@ -39,21 +39,39 @@ Ogrenme oranlarinin tek basina degerlendirilmesi eksik cikarimlara yol acabilece
 | Scikit-learn MLP | %98.84 | 1.000 | 0.9687 | 0.9841 | TN=54, FP=0, FN=1, TP=31 |
 | PyTorch (64) | %97.67 | 1.000 | 0.9375 | 0.9677 | TN=54, FP=0, FN=2, TP=30 |
 
-## 4. Tartisma ve Overfitting Analizi (Discussion)
+## 4. Tartisma ve Model Analizleri (Discussion)
 
-1. Confusion Matrix Gerekliligi: 
-Model testinde yalnizca dogruluk (accuracy) metrigi kullanilmamistir. Tibbi tahminlerde accuracy oranlarindan ziyade kanser tespit edilememe (False Negative) hatalarindan kacinmak onceliklidir. Bu sebeple calismada Recall ve F1 Score degerleri ana karsilastirma metrikleri olarak atanmis ve False Negative (FN) oranlari uzerinden degerlendirme yapilmistir.
+4.1. Confusion Matrix Gerekliligi
+Tip tespit sistemlerinde hatali teshisin gozden kacilmamasi (False Negative) Accuracy oranlarindan daha elzemdir. Bu nedenden oturu Recall ve F1 Score degerleri referans alinmis ve modellerin False Negative (FN) retme egilimleri esas test degiskeni olarak ayarlanmistir.
 
-2. Overfitting (Asiri Ogrenme) Analizi: 
-Egitim surecinde Mini-batch modelinin validation kaybi 204. epoch itibariyla minimum (0.0807) seviyesine inmis, epochlarin devam etmesiyle (1000. epok) kayip degerinin yeniden artis (0.1286) ivmesine girdigi hesaplanmistir. Egitim loss degerinin azalmasina karsin validation loss degerinin yukselmesi overfitting tablosunu kanitlamaktadir. Early Stopping fonksiyonu devreye alinarak yaklasik 200. epoch civarinda egitimin kesilmesiyle genelleme yetenegi artirilabilecektir. Ote yandan, Genis Model varyasyonunda negatif bir GAP (-0.0108) hesaplanmis olup modelin optimizasyona (good fit) eristigi gorulmustur.
+4.2. Overfitting (Yuksek Varyans) Analizi
+Mini-batch kullanilan varyasyonda validation loss degeri 204. epoch periyodunda minimum (0.0807) seyrinde kalmis, ilerleyen donemde dogruluk artisina karsin validation kaybi ivmelenerek (0.1286) artmistir. Bu durum dogrudan sekilde Overfitting (yuksek varyans) kanitidir. Sisteme entegre edilebilecek bir Early Stopping fonksiyonu ile asiri ogrenmenin onune gecilerek genelleme yetenegi korunabilir.
 
-3. Scikit-Learn ve PyTorch Altyapi Kiyaslamasi: 
-Manuel NumPy matrisleri ile kurgulanan temel model; Scikit-learn standart kutuphanesi kapsamindaki MLPClassifier ile tamamen ayni hiperparametreler altinda test edilmistir. Test uzayinda modellerin birbirleriyle ayni dogruluk (Accuracy: 0.9884) ve hatirlama (Recall: 0.968) oranlari verdigi, Confusion Matrix elemanlarinin dahi (TP=31, FN=1) eslestigi gorulmustur. Kurgulanan geri yayilim (Backpropagation) matris turev algoritmalarinin amaca ulastigi dogrulanmistir.
+4.3. Underfitting (Yuksek Bias) Analizi
+Ag egitim surecinde hicbir model Underfitting (yetersiz ogrenme / yuksek bias) bulgusu uretmemistir. Ogrenen modeller kisa egitim denemelerinde %97 performans barajini gecmektedir. Veri setinin iyi ayrilabilir uclar sunmasindan dolayi 64 noronlu temel mimari verinin yapisini formilize etmek icin yeterli dogrusal olmayan sinir kapasitesi yakalamaktadir. Hatta katman sayisinin artirildigi (Derin model kurgusu) durumda test performansi sicramasi yasanmamasina ragmen bias seviyesi stabil kalarak; mevcut kapasitenin ogrenme gorevi icin optimum oldugu tespit edilmistir. 
 
-## 5. Proje Yapisi ve Calistirma (Structure & Usage)
+4.4. Dogruluk ve Epoch Kriterine Gore Model Secimi
+Farkli mimariler ile test edilen varyasyonlar icinde veriyi ezberlemekten uzaklasarak en hizli sekilde accuracy istikrarini saglayan yapi Genis Model varyasyonudur. Negatif bir validation/train kayıp araligi (GAP degeri: -0.0108) urettigi hesaplanan genis mimarinin optimum dengesine 554. epok sirasinda eristigi sonucuna ulasilmistir.
 
-Proje dosya hiyerarsisi asagida listelenmistir:
+4.5. Scikit-Learn ve PyTorch Altyapi Karsilastirmasi
+Uygulamasi gelistirilen sinif yapisi, ayni hiperparametrelerin atandigi Scikit-learn MLPClassifier kutuphanesi ile capraz test isleminden gecirilmistir. Iki mimarinin Test uzayi baglaminda TP=31, FN=1 ve oransal dogruluklarda (Accuracy: 0.9884, Recall: 0.968) hata payi vermeden eslestigi gozlemlenmistir. OOP yapisina kurulan manuel matris geri yayilim (Backpropagation) mekanizmalarinin optimizasyon sagladigi ve islevselligi pruzsuz olarak dogrulanmistir.
 
+
+## 5. Ekler ve Referanslar (References)
+Veri Seti: 
+[Breast Cancer Wisconsin Data](https://www.kaggle.com/datasets/uciml/breast-cancer-wisconsin-data/data)
+From scratch referanslari:
+- [NumPy Official Documentation](https://numpy.org/doc/stable/): Matris carpimlari ve gradyan operasyonlarinin (dot product, broadcasting) algoritma ici tespiti referans alinmistir.
+- [Scikit-learn Metrics and Scoring](https://scikit-learn.org/stable/modules/model_evaluation.html): Karmasiklik matrisi parcalanmasi ve siniflandirma metriklerinin denklemleri hedeflenmistir.
+- [Scikit-learn Preprocessing](https://scikit-learn.org/stable/modules/preprocessing.html): Standardizasyon ve olceklendirme adimlari uygulanmistir.
+- [PyTorch nn.Module Documentation](https://pytorch.org/docs/stable/generated/torch.nn.Module.html): Sinir agi katmanlarinin ve noronlarin Nesne yonelimli (OOP) yapilanmasina kiyaslama tutulmustur.
+
+
+## 6. Proje Yapisi ve Calistirma (Structure & Usage)
+
+Platform bagimsiz tekrar edilebilirlik acisindan proje hiyerarsisi asagida listelenmistir:
+
+```text
 Odev1/
   src/
     __init__.py
@@ -74,23 +92,8 @@ Odev1/
 Sanal Ortam ve Calistirma Yonergesi:
 
 python -m venv venv
-venv\Scripts\activate      # Windows
-# source venv/bin/activate   # Linux/Mac
+venv\Scripts\activate      # Windows ortamlarinda
+# source venv/bin/activate # Linux/Mac ortamlarinda
+
 pip install -r requirements.txt
 jupyter notebook proje.ipynb
-
-## 6. Ekler ve Referanslar (References)
-
-Veri Seti:
-
-https://www.kaggle.com/datasets/uciml/breast-cancer-wisconsin-data/data
-
-From scratch referanslari:
-
-NumPy Official Documentation: Matris carpimlari ve gradyan operasyonlarinin (dot product, broadcasting) dogrulanmasi.
-
-Scikit-learn Metrics and Scoring: Karmasiklik matrisinin hesaplanmasi ve siniflandirma metriklerinin altyapisindaki denklemlerin karsilastirilmasi.
-
-Scikit-learn Preprocessing: Veri on isleme surecleri.
-
-PyTorch nn.Module Documentation: Sinir agi katmanlarinin ve fonksiyonlarinin (OOP) standartlarina uygun olarak kiyaslanmasi.
