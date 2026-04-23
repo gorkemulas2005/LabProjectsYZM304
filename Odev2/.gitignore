@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# CIFAR-10 indirilen veri (buyuk dosyalar)
+data/cifar-10-batches-py/
+data/cifar-10-python.tar.gz
+
+# Model agirliklari (buyuk dosyalar)
+models/*.pth
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Gecici dosyalar
+*.pyc
+*.pyo
+build_notebook.py
+proje_executed.ipynb
