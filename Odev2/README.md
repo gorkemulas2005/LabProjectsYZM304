@@ -72,6 +72,7 @@ CIFAR-10 veri seti gibi kompleks (dusuk cozunurluklu fakat cesitli nesneler bari
 2. VGG-16 Mimarisi: Simonyan, K., & Zisserman, A. (2014). *Very Deep Convolutional Networks for Large-Scale Image Recognition*.
 3. Adam Optimizer: Kingma, D. P., & Ba, J. (2014). *Adam: A Method for Stochastic Optimization*.
 4. PyTorch ve Scikit-Learn Resmi Dokumantasyonlari.
+
 **Veri Seti:**
 - [CIFAR-10 Dataset](https://www.cs.toronto.edu/~kriz/cifar.html) (Ağın eğitimi ve performans ölçümü için kullanılmıştır.)
 
