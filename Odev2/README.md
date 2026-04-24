@@ -1,46 +1,74 @@
-# Odev 2: Nesne Yönelimli Derin Öğrenme ile CIFAR-10 Sınıflandırma
+# Odev2: CIFAR-10 Goruntu Siniflandirma (CNN & Hibrit Modeller)
 
-Bu proje kapsamında CIFAR-10 veri seti kullanılarak görüntü sınıflandırma problemi çözülmüştür. Çalışmada beş farklı model mimarisi denenmiş, Nesne Yönelimli Programlama (OOP) prensipleri kullanılarak temiz ve modüler bir kod yapısı oluşturulmuştur.
+Bu proje kapsaminda CIFAR-10 veri seti kullanilarak 5 farkli sinir agi ve makine ogrenmesi yaklasimi (Sifirdan CNN, Gelistirilmis CNN, Transfer Learning, CNN + SVM ve CNN + Random Forest) uzerinde siniflandirma performanslari kiyaslanmistir. Tüm modeller PyTorch kütüphanesi ve Nesne Yonelimli Programlama (OOP) prensipleri dogrultusunda kurgulanmistir.
 
-## 1. Giriş (Introduction)
+## 1. Giris (Introduction)
+Evrisimli Sinir Aglari (CNN), goruntu isleme ve bilisavarlarla gorme alaninda standart kabul edilen mimarilerdir. Ancak bir agin sifirdan tasarlanmasi, hiperparametre optimizasyonu ve mevcut on-egitilmis agirliklarin (Transfer Learning) bu sureclere entegrasyonu performansi dogrudan etkileyen faktorlerdir. 
+Bu calismanin amaci, ayni veri seti uzerinde tamamen ayni sartlarda calisan temel bir CNN mimarisi ile, BatchNorm ve Dropout gibi duzenleme (regularization) teknikleri uygulanmis bir varyasyonunu kiyaslamaktir. Ek olarak, derin bir literatur agi olan VGG-16'nin transfer ogrenme gucu ve ayrica bir CNN'in yalnizca ozellik cikarici (feature extractor) olarak kullanilip klasik ML (SVM, Random Forest) modelleriyle hibritlendigi senaryolar degerlendirilmistir.
 
-Görüntü sınıflandırma, bilgisayarlı görü alanının temel problemlerinden biridir. Bu çalışmanın temel amacı, farklı derin öğrenme ve klasik makine öğrenmesi algoritmalarının karmaşık görüntü veri setleri üzerindeki performanslarını analiz etmek ve karşılaştırmaktır. CIFAR-10 veri seti; 10 farklı sınıfa ait 60.000 adet 32x32 piksel renkli görüntüden oluşmaktadır. Proje gereksinimleri doğrultusunda, tüm yapı Nesne Yönelimli Programlama (OOP) metodolojisine uygun olarak kapsüllenmiştir.
+## 2. Metot (Methods)
 
-## 2. Metodoloji (Methodology)
+### 2.1 Veri Seti ve On Isleme
+Veri seti olarak `CIFAR-10` secilmistir (10 sinif, 60.000 adet 32x32 boyutlarinda RGB goruntu).
+* **Veri Artirma (Data Augmentation)**: Modelin asiri ogrenmesini engellemek ve genellenebilirligini artirmak amaciyla egitim setine yatay cevirme (`RandomHorizontalFlip`) ve kirpma (`RandomCrop(32, padding=4)`) islemleri uygulanmistir.
+* **Normalizasyon**: Pikseller `[0,1]` araligina alindiktan sonra CIFAR-10 kanal ortalamalari `(0.4914, 0.4822, 0.4465)` ve standart sapmalari `(0.2470, 0.2435, 0.2616)` kullanilarak standardize edilmistir. 
+* **VGG-16 Duzenlemesi**: Model 3 (Transfer Learning) calistirilirken VGG-16'nin girdi boyutu beklentisi nedeniyle goruntuler `Resize(224)` ile buyutulmustur.
 
-### 2.1. Veri Ön İşleme
-Veri seti yüklenirken modelin genellenebilirliğini artırmak amacıyla Veri Artırma (Data Augmentation) teknikleri (Rastgele Kırpma, Yatay Döndürme) kullanılmıştır. Görüntüler `[0.4914, 0.4822, 0.4465]` ortalama ve `[0.2023, 0.1994, 0.2010]` standart sapma değerleri ile normalize edilmiştir. VGG-16 modeli için ise görüntüler 224x224 piksel boyutlarına yeniden boyutlandırılmıştır (`resize_224=True`).
+### 2.2 Model Mimarileri ve Kullanilan Parametreler
+Secilen tum modeller icin ortak hiperparametreler su sekildedir:
+* **Optimizer**: `Adam`. Adaptif ogrenme orani ve momentum birlesimi sayesinde hizli yakinsama hedeflenmistir. 
+* **Learning Rate**: `0.001`. Adam optimizasyonu icin stabil varsayilan deger secilmistir.
+* **Loss Fonksiyonu**: `CrossEntropyLoss`. Cok sinifli siniflandirma problemleri icin standart kayip metrigidir.
+* **Batch Size**: `64`. GPU bellek (NVIDIA RTX 4050) ve islem hizi optimum oranda tutulmustur.
 
-### 2.2. Model Mimarileri
-Projede birbirini kapsayan ve gelişen 5 farklı model test edilmiştir:
-1. **Model 1 (Temel CNN):** 3 evrişim (convolution) ve 2 tam bağlantılı (fully connected) katmandan oluşan standart derin öğrenme modeli.
-2. **Model 2 (Geliştirilmiş CNN):** Temel CNN modeline Aşırı Öğrenmeyi (Overfitting) engellemek amacıyla Batch Normalization ve Dropout (%50) katmanları eklenmiş versiyon.
-3. **Model 3 (VGG-16 Transfer Learning):** ImageNet veri setinde önceden eğitilmiş VGG-16 modeli. Önceden eğitilmiş ağırlıklar dondurulmuş (freeze), sadece son tam bağlantılı sınıflandırma katmanı (Classifier) CIFAR-10 için 10 sınıfa indirgenerek yeniden eğitilmiştir.
-4. **Model 4 (Hibrit - SVM):** Geliştirilmiş CNN (Model 2) mimarisi "Özellik Çıkarıcı" (Feature Extractor) olarak kullanılmış, elde edilen matrisler `.npy` formatında dışa aktarılarak Destek Vektör Makineleri (SVM) ile sınıflandırılmıştır.
-5. **Model 5 (Hibrit - Random Forest):** Hibrit modelin sınıflandırıcı kısmı SVM yerine Rastgele Orman (Random Forest) algoritması kullanılarak kurulmuştur.
+**Gelistirilen 5 Modelin Detaylari:**
+1. **Model 1 (Temel CNN):** LeNet-5 mimarisinin CIFAR-10 (3x32x32) formatina uyarlanmis halidir. 2 Convolutional (Conv2d) + MaxPool katmani ardindan 3 Tam Baglantili (Linear) katman icermektedir. 20 epoch egitilmistir.
+2. **Model 2 (Gelistirilmis CNN):** Model 1 ile mimarisi ve epoch sayisi (20 epoch) tamamen aynidir. Ancak hizli ogrenim ve over-fitting kontrolu amaciyla her `Conv2d` sonrasi `BatchNorm2d`, FC katmanlari arasina ise `Dropout(p=0.5)` eklenmistir.
+3. **Model 3 (VGG-16 Transfer Learning):** Orijinal `torchvision.models` modulunden onceden egitilmis (Pretrained) VGG-16 cekilmistir. Ozellik cikarici (`features`) katmanlari dondurulmus (freeze), yalnizca son FC katmani 10 sinifa yeniden duzenlenerek ag 10 epoch boyunca egitilmistir.
+4. **Model 4 (Hibrit CNN + ML):** Egitilmis Model 2, sadece "ozellik cikarici" olarak konumlandirilmistir. Son FC katmanindan onceki 84 boyutlu neron ciktilari yakalanarak `.npy` dosyalari olarak (Train: 16 MB, Test: 3.2 MB) diske kaydedilmistir. Bu cikarilan matrisler, RBF kernelli DVM (SVM, C=10) ve Random Forest (n_estimators=200) uzerinde egitilmistir.
+5. **Model 5 (Hibrit Kiyaslama):** Odev sartlarinda belirtildigi uzere ayni test setini kullanan klasik tam CNN (Model 2) ile Hibrit (Model 4) sonuclari birbirine karsi mukayese edilmistir.
 
-Tüm bu mimariler `src/classifier.py` ve `src/hybrid.py` içerisindeki `CNNClassifier` ve `HybridClassifier` sınıfları (class) aracılığıyla nesne yönelimli olarak eğitilmiş ve değerlendirilmiştir.
+## 3. Sonuclar (Results)
 
-## 3. Bulgular (Results)
+Model kiyaslamalarina ait Accuracy metrikleri ve egitim sureleri (RTX 4050 uzerinde) asagidaki tabloda verilmistir:
 
-Araştırma sonucunda `proje.ipynb` üzerinden elde edilen nihai Test Doğruluk (Accuracy) oranları aşağıda sunulmuştur:
+| Model | Test Accuracy | Egitim Suresi |
+| :--- | :--- | :--- |
+| Model 1 (Temel CNN) | **65.75%** | 328.8s |
+| Model 2 (Iyilestirilmis CNN) | 61.60% | 335.2s |
+| Model 3 (VGG-16 Transfer) | **87.64%** | 3761.7s |
+| Model 4 (Hibrit - SVM) | 61.95% | -- |
+| Model 4 (Hibrit - Random Forest) | 61.68% | -- |
 
-- **Model 1 (Temel CNN):** %71.0
-- **Model 2 (Geliştirilmiş CNN):** %61.0
-- **Model 3 (VGG-16 Transfer Learning):** %86.0
-- **Model 4 (Hibrit - SVM):** %71.0
-- **Model 5 (Hibrit - Random Forest):** %54.0
+*Grafik ciktilari (Loss, Confusion Matrix vb.) kod klasorundeki `outputs` altinda bulunmaktadir.*
 
-### Performans Analizi
-Elde edilen sayılara göre Model 3 (VGG-16) beklendiği gibi %86 doğruluk oranı ile en başarılı model olmuştur. İlginç bir şekilde, Dropout ve Batch Normalization eklenen Model 2 (%61), Temel CNN olan Model 1'in (%71) gerisinde kalmıştır. Bu durum, veri seti için kullanılan hiperparametrelerin (Epoch=10) Model 2'nin kapasitesini tam doldurmasına (convergence) yetmediğine işaret etmektedir.
+## 4. Tartisma ve Analiz (Discussion & Analysis)
 
-Klasik Makine Öğrenmesi hibridasyonlarında SVM (%71) oldukça başarılı bir genelleme yaparken, Random Forest (%54) CNN'den gelen yüksek boyutlu sürekli değişken özelliklerinde (continuous features) karar ağaçlarının doğası gereği zorlanmıştır.
+Elde edilen sonuclara gore modellerin performanslari ve veri isleme surecleri uzerine su cikarimlar yapilmistir:
 
-## 4. Tartışma ve Sonuç (Discussion)
+**1. Sifirdan Kurulan Aglar: Model 1 ve Model 2 Karsilastirmasi**
+Ayni mimariye (LeNet-5 tabanli) sahip olmalarina ragmen, temel Model 1 (%65.75) ve iyilestirilmis Model 2 (%61.60) arasinda sasirtici bir sonuc elde edilmistir. 
+- *Neden Model 1 Daha Iyi?* Model 2'ye eklenen `Dropout(p=0.5)` katmani, agdaki neronlarin yarisini rastgele devredisi birakarak kati bir ceza (regularization) uygulamaktadir. 20 epoch'luk kisa bir egitim suresinde, Dropout'un ogrenmeyi yavaslatma etkisi baskin cikmis ve ag tam kapasitesine ulasamamistir. 
+- *Egitim Suresi:* Her iki model de 330 saniye bandinda egitilmistir (Model 1: 328.8s, Model 2: 335.2s). BatchNorm katmaninin getirdigi ufak hesaplama yuku goz ardi edilebilir seviyededir.
 
-Çalışma, Transfer Learning (VGG-16) metodunun sıfırdan model eğitmeye (Model 1 & Model 2) kıyasla devasa bir avantaj sağladığını deneysel olarak ispatlamıştır. Sadece son katmanı eğitilen bir VGG-16, 10 epoch gibi kısa bir sürede bile son teknoloji seviyesine yaklaşabilmektedir.
+**2. On Egitimli (Pretrained) Agin Gucu: Model 3 (VGG-16)**
+Model 3, yalnizca 10 epoch egitilmesine ragmen **%87.64** test dogrulugu ile en basarili model olmustur. 
+- *Cikarim:* ImageNet veri setiyle onceden egitilen VGG-16, kenar ve doku gibi temel ozellikleri halihazirda taniyabilmektedir. CIFAR-10 goruntuleri `224x224` boyutuna cikarilip bu aga verildiginde, ag sadece son siniflandirma katmanini guncelleyerek inanilmaz bir isabet oranina ulasmistir. Ancak bu islem, `3761.7 saniye` (yaklasik 1 saat) surmus ve devasa (134 milyon parametreli) mimarinin islemsel maliyetini gozler onune sermistir.
 
-Ayrıca, Hibrit modellerin (Model 4 & Model 5) başarısı doğrudan özellik çıkarıcı (Feature Extractor) olarak kullanılan CNN'in (Model 2) başarısına bağlıdır. Model 2'nin %61 doğrulukta kalması, ondan özellik alan SVM ve RF modellerinin de potansiyel sınırlarını belirlemiştir. Nesne Yönelimli Programlama ile kurulan bu altyapı, ileride yeni modellerin (ResNet, DenseNet vb.) sisteme tek bir satır kod ile entegre edilmesine olanak sağlamaktadır.
+**3. Klasik Makine Ogrenmesi ve CNN Hibritlemesi: Model 4**
+Model 2'nin son FC katmanindan hemen onceki `84 boyutlu` tensörler cikarilmis (Egitim: 50.000 x 84 matris) ve klasik makine ogrenmesi algoritmalarina verilmistir.
+- *SVM (%61.95)* ve *Random Forest (%61.68)* modelleri, onlara ozellik cikarici olarak hizmet eden Model 2 (%61.60) ile neredeysa birebir ayni performansi gostermistir.
+- *Cikarim:* Klasik bir ML modeli (SVM/RF), girdi olarak ham pikseller yerine **iyi ayiklanmis neron ciktilarini (feature maps)** aldiginda, derindeki bir yapay sinir agi (CNN) kadar basarili olabilmektedir. Bu durum, CNN'lerin asil gucunun "siniflandirmadan" ziyade "otomatik ozellik cikarimi" yapmalarinda yattigini matematiksel olarak ispatlamaktadir.
 
----
-**Not:** Modellerin eğitilmiş ağırlıkları `.pth` formatında olup boyutları çok büyük olduğu için GitHub'a yüklenmemiştir. Ağırlıklar `models/` klasörüne lokal eğitim sırasında kaydedilir. CIFAR-10 verisi ise `data_preprocessing.py` içindeki `torchvision` tarafından otomatik indirilmektedir.
+## 5. Sonuc
+CIFAR-10 veri seti gibi kompleks (dusuk cozunurluklu fakat cesitli nesneler barindiran) problemlerde:
+1. Donanim (GPU) gucu elverdigi surece **Transfer Learning (VGG-16 vb.)** tartismasiz en iyi performansi (%87.64) sunmaktadir.
+2. Sifirdan model egitilecekse `Dropout` oranlari, epoch sayisina gore (kisa sureli egitimler icin p=0.2 gibi) optimize edilmelidir.
+3. Disk uzerinde `.npy` formatinda ozellik tasiyarak kurulan Hibrit sistemler, klasik ML algoritmalarina derin ogrenme kabiliyeti kazandirabilen gecerli bir alternatiftir.
+
+## 6. Referanslar (References)
+
+1. CIFAR-10 Dataset: Krizhevsky, A. (2009). *Learning Multiple Layers of Features from Tiny Images*.
+2. VGG-16 Mimarisi: Simonyan, K., & Zisserman, A. (2014). *Very Deep Convolutional Networks for Large-Scale Image Recognition*.
+3. Adam Optimizer: Kingma, D. P., & Ba, J. (2014). *Adam: A Method for Stochastic Optimization*.
+4. PyTorch ve Scikit-Learn Resmi Dokumantasyonlari.
