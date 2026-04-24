@@ -2,11 +2,11 @@
 
 Bu proje kapsaminda CIFAR-10 veri seti kullanilarak 5 farkli sinir agi ve makine ogrenmesi yaklasimi (Sifirdan CNN, Gelistirilmis CNN, Transfer Learning, CNN + SVM ve CNN + Random Forest) uzerinde siniflandirma performanslari kiyaslanmistir. Tüm modeller PyTorch kütüphanesi ve Nesne Yonelimli Programlama (OOP) prensipleri dogrultusunda kurgulanmistir.
 
-## 1. Giris (Introduction)
+## 1. Giris
 Evrisimli Sinir Aglari (CNN), goruntu isleme ve bilisavarlarla gorme alaninda standart kabul edilen mimarilerdir. Ancak bir agin sifirdan tasarlanmasi, hiperparametre optimizasyonu ve mevcut on-egitilmis agirliklarin (Transfer Learning) bu sureclere entegrasyonu performansi dogrudan etkileyen faktorlerdir. 
 Bu calismanin amaci, ayni veri seti uzerinde tamamen ayni sartlarda calisan temel bir CNN mimarisi ile, BatchNorm ve Dropout gibi duzenleme (regularization) teknikleri uygulanmis bir varyasyonunu kiyaslamaktir. Ek olarak, derin bir literatur agi olan VGG-16'nin transfer ogrenme gucu ve ayrica bir CNN'in yalnizca ozellik cikarici (feature extractor) olarak kullanilip klasik ML (SVM, Random Forest) modelleriyle hibritlendigi senaryolar degerlendirilmistir.
 
-## 2. Metot (Methods)
+## 2. Metotlar
 
 ### 2.1 Veri Seti ve On Isleme
 Veri seti olarak `CIFAR-10` secilmistir (10 sinif, 60.000 adet 32x32 boyutlarinda RGB goruntu).
@@ -28,7 +28,7 @@ Secilen tum modeller icin ortak hiperparametreler su sekildedir:
 4. **Model 4 (Hibrit CNN + ML):** Egitilmis Model 2, sadece "ozellik cikarici" olarak konumlandirilmistir. Son FC katmanindan onceki 84 boyutlu neron ciktilari yakalanarak `.npy` dosyalari olarak (Train: 16 MB, Test: 3.2 MB) diske kaydedilmistir. Bu cikarilan matrisler, RBF kernelli DVM (SVM, C=10) ve Random Forest (n_estimators=200) uzerinde egitilmistir.
 5. **Model 5 (Hibrit Kiyaslama):** Odev sartlarinda belirtildigi uzere ayni test setini kullanan klasik tam CNN (Model 2) ile Hibrit (Model 4) sonuclari birbirine karsi mukayese edilmistir.
 
-## 3. Sonuclar (Results)
+## 3. Sonuclar
 
 Model kiyaslamalarina ait Accuracy metrikleri ve egitim sureleri (RTX 4050 uzerinde) asagidaki tabloda verilmistir:
 
@@ -42,7 +42,7 @@ Model kiyaslamalarina ait Accuracy metrikleri ve egitim sureleri (RTX 4050 uzeri
 
 *Grafik ciktilari (Loss, Confusion Matrix vb.) kod klasorundeki `outputs` altinda bulunmaktadir.*
 
-## 4. Tartisma ve Analiz (Discussion & Analysis)
+## 4. Cikarimlar ve Analiz
 
 Elde edilen sonuclara gore modellerin performanslari ve veri isleme surecleri uzerine su cikarimlar yapilmistir:
 
@@ -51,7 +51,7 @@ Ayni mimariye (LeNet-5 tabanli) sahip olmalarina ragmen, temel Model 1 (%65.75) 
 - *Neden Model 1 Daha Iyi?* Model 2'ye eklenen `Dropout(p=0.5)` katmani, agdaki neronlarin yarisini rastgele devredisi birakarak kati bir ceza (regularization) uygulamaktadir. 20 epoch'luk kisa bir egitim suresinde, Dropout'un ogrenmeyi yavaslatma etkisi baskin cikmis ve ag tam kapasitesine ulasamamistir. 
 - *Egitim Suresi:* Her iki model de 330 saniye bandinda egitilmistir (Model 1: 328.8s, Model 2: 335.2s). BatchNorm katmaninin getirdigi ufak hesaplama yuku goz ardi edilebilir seviyededir.
 
-**2. On Egitimli (Pretrained) Agin Gucu: Model 3 (VGG-16)**
+**2. On Egitimli (Pretrained) Ag: Model 3 (VGG-16)**
 Model 3, yalnizca 10 epoch egitilmesine ragmen **%87.64** test dogrulugu ile en basarili model olmustur. 
 - *Cikarim:* ImageNet veri setiyle onceden egitilen VGG-16, kenar ve doku gibi temel ozellikleri halihazirda taniyabilmektedir. CIFAR-10 goruntuleri `224x224` boyutuna cikarilip bu aga verildiginde, ag sadece son siniflandirma katmanini guncelleyerek inanilmaz bir isabet oranina ulasmistir. Ancak bu islem, `3761.7 saniye` (yaklasik 1 saat) surmus ve devasa (134 milyon parametreli) mimarinin islemsel maliyetini gozler onune sermistir.
 
@@ -66,7 +66,7 @@ CIFAR-10 veri seti gibi kompleks (dusuk cozunurluklu fakat cesitli nesneler bari
 2. Sifirdan model egitilecekse `Dropout` oranlari, epoch sayisina gore (kisa sureli egitimler icin p=0.2 gibi) optimize edilmelidir.
 3. Disk uzerinde `.npy` formatinda ozellik tasiyarak kurulan Hibrit sistemler, klasik ML algoritmalarina derin ogrenme kabiliyeti kazandirabilen gecerli bir alternatiftir.
 
-## 6. Referanslar (References)
+## 6. Referanslar
 
 1. CIFAR-10 Dataset: Krizhevsky, A. (2009). *Learning Multiple Layers of Features from Tiny Images*.
 2. VGG-16 Mimarisi: Simonyan, K., & Zisserman, A. (2014). *Very Deep Convolutional Networks for Large-Scale Image Recognition*.
