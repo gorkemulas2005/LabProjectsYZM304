@@ -58,7 +58,7 @@ def get_transforms(train: bool = True, resize_224: bool = False):
 
 
 def get_cifar10_loaders(batch_size: int = 64, data_dir: str = None,
-                        resize_224: bool = False, num_workers: int = 2):
+                        resize_224: bool = False, num_workers: int = 0):
     """CIFAR-10 train ve test DataLoader nesnelerini dondurur.
 
     Veri seti yoksa otomatik indirilir.
