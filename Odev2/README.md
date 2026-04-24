@@ -66,15 +66,17 @@ CIFAR-10 veri seti gibi kompleks (dusuk cozunurluklu fakat cesitli nesneler bari
 2. Sifirdan model egitilecekse `Dropout` oranlari, epoch sayisina gore (kisa sureli egitimler icin p=0.2 gibi) optimize edilmelidir.
 3. Disk uzerinde `.npy` formatinda ozellik tasiyarak kurulan Hibrit sistemler, klasik ML algoritmalarina derin ogrenme kabiliyeti kazandirabilen gecerli bir alternatiftir.
 
-## 6. Referanslar
+## 6. Ekler ve Referanslar
 
-5. Ekler ve Referanslar
-Veri Seti:
+1. CIFAR-10 Dataset: Krizhevsky, A. (2009). *Learning Multiple Layers of Features from Tiny Images*.
+2. VGG-16 Mimarisi: Simonyan, K., & Zisserman, A. (2014). *Very Deep Convolutional Networks for Large-Scale Image Recognition*.
+3. Adam Optimizer: Kingma, D. P., & Ba, J. (2014). *Adam: A Method for Stochastic Optimization*.
+4. PyTorch ve Scikit-Learn Resmi Dokumantasyonlari.
+**Veri Seti:**
+- [CIFAR-10 Dataset](https://www.cs.toronto.edu/~kriz/cifar.html) (Ağın eğitimi ve performans ölçümü için kullanılmıştır.)
 
-CIFAR-10 Dataset (Ağın eğitimi ve performans ölçümü için kullanılmıştır.)
-Kullanilan Kütüphaneler:
-
-PyTorch (torch, torchvision) (Derin öğrenme modellerinin nesne yönelimli yapılanması nn.Module, veri augmentasyon işlemi, kayıp hesaplamaları ve gradyan optimizasyonları için kullanılmıştır.)
-Scikit-learn (Hibrit modellerde CNN'in özellik çıkarıcı çıktılarının kullanılarak Destek Vektör Makineleri SVC ve Rastgele Orman RandomForestClassifier algoritmalarının eğitilmesi ve test edilmesi için kullanılmıştır.)
-NumPy (Hibrit modellerde özellik ve etiket setlerinin .npy formatında belleğe alınması, matris boyutlandırmaları ve istatistik işlemleri için kullanılmıştır.)
-Matplotlib / Seaborn (Model öğrenme eğrilerinin ve karmaşıklık matrislerinin ısı haritaları halinde görselleştirilmesi için kullanılmıştır.)
+**Kullanilan Kütüphaneler:**
+- [PyTorch (torch, torchvision)](https://pytorch.org/docs/stable/index.html) (Derin öğrenme modellerinin nesne yönelimli yapılanması `nn.Module`, veri augmentasyon işlemi, kayıp hesaplamaları ve gradyan optimizasyonları için kullanılmıştır.)
+- [Scikit-learn](https://scikit-learn.org/stable/) (Hibrit modellerde CNN'in özellik çıkarıcı çıktılarının kullanılarak Destek Vektör Makineleri `SVC` ve Rastgele Orman `RandomForestClassifier` algoritmalarının eğitilmesi ve test edilmesi için kullanılmıştır.)
+- [NumPy](https://numpy.org/doc/stable/) (Hibrit modellerde özellik ve etiket setlerinin `.npy` formatında belleğe alınması, matris boyutlandırmaları ve istatistik işlemleri için kullanılmıştır.)
+- [Matplotlib / Seaborn](https://matplotlib.org/) (Model öğrenme eğrilerinin ve karmaşıklık matrislerinin ısı haritaları halinde görselleştirilmesi için kullanılmıştır.)
